@@ -1,0 +1,11 @@
+{
+  "name": "tap-i18n-db",
+  "description": "Internationalization for Meteor Collections",
+  "homepage": "https://github.com/TAPevents/tap-i18n-db",
+  "author": "Daniel Chcouri <333222@gmail.com> for tap-events: http://www.tapevents.com",
+  "version": "0.1.0",
+  "git": "https://github.com/TAPevents/tap-i18n-db",
+  "packages": {
+    "tap-i18n": {}
+  }
+}

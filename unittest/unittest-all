@@ -1,0 +1,167 @@
+#!/bin/bash
+
+set -m
+
+# OS Check. Put here because here is where we download the precompiled
+# bundles that are arch specific.
+UNAME=$(uname)
+if [ "$UNAME" != "Linux" -a "$UNAME" != "Darwin" ] ; then
+    echo "Sorry, this OS is not supported."
+    exit 1
+fi
+
+# START get true PWD
+# (http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in/179231)
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+pushd . > /dev/null
+# END get true PWD
+
+# cd to the package dir
+cd "$DIR/.."
+
+script_name=$(basename $0)
+test_name=${script_name##unittest-}
+
+default_unified_langs_dir=".meteor/local/tap-i18n"
+fallback_lang="en"
+
+# meteor_unittests_start(test_name, description)
+meteor_unittests_start () {
+    echo ""
+    echo "### Running Meteor Unittests for test environment: $1"
+    echo "### Test Description: $2"
+    echo "###"
+    echo "### Break (ctrl+c) after Meteor init to finish and move to the next test"
+
+    clean
+}
+
+meteor_unittests_end () {
+    :
+}
+
+remove_package_js_test_section () {
+    if [[ "$UNAME" == "Darwin" ]]; then
+        sed -i '' '/Package.on_test/,/});/d' package.js
+    elif [[ "$UNAME" == "Linux" ]]; then
+        sed -i '/Package.on_test/,/});/d' package.js
+    fi
+}
+
+clean () {
+    rm -f project-tap.i18n
+    remove_package_js_test_section
+}
+
+# add_package_js_test_section(test_specific_code, unittest_name1, unittest_name2, ...)
+add_package_js_test_section () {
+    test_specific="$1"
+    shift
+
+    remove_package_js_test_section
+
+    cat <<EOF >> package.js
+Package.on_test(function (api) {
+  //
+  // DO NOT ADD THIS Package.on_test TO GIT!!!
+  // DO NOT ADD THIS Package.on_test TO GIT!!!
+  // DO NOT ADD THIS Package.on_test TO GIT!!!
+  //
+  api.use(['tinytest', 'test-helpers', 'templating', 'jquery', "reactive-dict"], ['client', 'server']);
+
+  $test_specific
+
+  api.use('tap-i18n-db', ['client', 'server']);
+
+  api.use('coffeescript', ['client', 'server']);
+
+  api.add_files('unittest/tests/helpers.coffee', ['client', 'server']);
+  api.add_files('unittest/tests/common.coffee', ['client', 'server']);
+EOF
+
+    for test_name in "$@"; do
+        echo "api.add_files('unittest/tests/$test_name.coffee', ['client', 'server']);" >> package.js
+    done
+
+    echo "});" >> package.js
+}
+
+run_meteor_test () {
+    local port=$1
+    export TAP_I18N_DIR="$(pwd)/.meteor/local/tap-i18n" 
+    export TAP_I18N_DEBUG="true" 
+    meteor --port=$1 test-packages ./
+}
+
+########################## TESTS ###########################
+
+test_disabled () {
+    local test_name="disabled" port=3000
+
+    meteor_unittests_start "$test_name" "test tap-i18n-db in a project where tap-i18n is disabled"
+
+    add_package_js_test_section "" "$test_name"
+
+    run_meteor_test $port
+
+    meteor_unittests_end
+}
+
+test_enabled () {
+    local test_name="enabled" port=3000
+
+    meteor_unittests_start "$test_name" "test tap-i18n-db in a project where tap-i18n is enabled"
+
+    echo '{"supported_languages": ["aa-AA"]}' > project-tap.i18n
+
+    package_js_on_test="$(cat <<EOF
+    api.use('tap-i18n', ['client', 'server']);
+    api.add_files('project-tap.i18n', ['client', 'server']);
+EOF
+    )"
+
+    add_package_js_test_section "$package_js_on_test" "$test_name"
+
+    TAP_I18N="enabled" run_meteor_test $port
+
+    meteor_unittests_end
+}
+
+test_enabled_autopublish () {
+    local test_name="enabled_autopublish" port=3000
+
+    meteor_unittests_start "$test_name" "test tap-i18n-db in a project where tap-i18n is enabled and the autopublish package is installed"
+
+    echo '{"supported_languages": ["aa-AA"]}' > project-tap.i18n
+
+    package_js_on_test="$(cat <<EOF
+    api.use('tap-i18n', ['client', 'server']);
+    api.use('autopublish', ['client', 'server']);
+    api.add_files('project-tap.i18n', ['client', 'server']);
+EOF
+    )"
+
+    add_package_js_test_section "$package_js_on_test" "enabled" "$test_name"
+
+    TAP_I18N="enabled" run_meteor_test $port
+
+    meteor_unittests_end
+}
+
+########################## MAIN ###########################
+
+if [[ $test_name == "all" ]]; then
+    test_disabled
+    test_enabled
+    test_enabled_autopublish
+else
+    test_"$test_name"
+fi
+
+clean
