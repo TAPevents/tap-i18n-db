@@ -3,7 +3,7 @@
   "description": "Internationalization (i18n) for Meteor Collections",
   "homepage": "https://github.com/TAPevents/tap-i18n-db",
   "author": "Daniel Chcouri <333222@gmail.com> for tap-events: http://www.tapevents.com",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "git": "https://github.com/TAPevents/tap-i18n-db",
   "packages": {
     "tap-i18n": {}

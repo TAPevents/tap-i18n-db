@@ -1,3 +1,9 @@
-2014.07.29, Version 0.1.0
+2014.07.30, Version 0.2.0
+
+* Bugfix: TAPi18n.subscription: Call onReady/Error() and error/ready() only
+  once per subscription (and not for every time we resubscribe as a result of a
+  language change)
+
+2014.07.29, Version 0.1.0, d993c168d7c64ff87fd66f8c16d6cbca80e3e514
 
 * tap-i18n-db first release
