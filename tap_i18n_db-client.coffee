@@ -34,7 +34,6 @@ share.i18nCollectionExtensions = (obj) ->
     findOne: obj.findOne
 
   local_session = new ReactiveDict()
-
   for method of original
     do (method) ->
       obj[method] = (selector, options) ->
@@ -54,9 +53,12 @@ share.i18nCollectionExtensions = (obj) ->
   return obj
 
 TAPi18n.subscribe = (name) ->
+  local_session = new ReactiveDict
+  local_session.set("ready", false)
+
   # parse arguments
   params = Array.prototype.slice.call(arguments, 1)
-  callbacks = undefined
+  callbacks = {}
   if params.length
     lastParam = params[params.length - 1]
     if (typeof lastParam == "function")
@@ -65,7 +67,24 @@ TAPi18n.subscribe = (name) ->
                              typeof lastParam.onError == "function"))
       callbacks = params.pop()
 
-  subscriptionChangedDep = new Deps.Dependency;
+  # We want the onReady/onError methods to be called only once (not for every language change)
+  onReadyCalled = false;
+  onErrorCalled = false;
+  original_onReady = callbacks.onReady;
+  callbacks.onReady = ->
+    if onErrorCalled
+      return
+
+    local_session.set("ready", true)
+
+    if original_onReady?
+      original_onReady()
+
+  if callbacks.onError?
+    callbacks.onError = ->
+      if onReadyCalled
+        _.once callbacks.onError
+
   subscription = null
   subscription_computation = null
   subscribe = ->
@@ -76,8 +95,6 @@ TAPi18n.subscribe = (name) ->
 
       subscription =
         Meteor.subscribe.apply @, removeTrailingUndefs [].concat(name, params, lang_tag, callbacks)
-
-      subscriptionChangedDep.changed()
 
   # If TAPi18n is called in a computation, to maintain Meteor.subscribe
   # behavior (which never gets invalidated), we don't want the computation to
@@ -100,9 +117,8 @@ TAPi18n.subscribe = (name) ->
 
   return {
     ready: () ->
-      subscriptionChangedDep.depend()
-      subscription.ready()
+      local_session.get("ready")
     stop: () ->
       subscription_computation.stop()
-    _subscription: subscription
+    _getSubscription: -> subscription
   }
