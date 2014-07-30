@@ -65,6 +65,7 @@ TAPi18n.subscribe = (name) ->
                              typeof lastParam.onError == "function"))
       callbacks = params.pop()
 
+  subscriptionChangedDep = new Deps.Dependency;
   subscription = null
   subscription_computation = null
   subscribe = ->
@@ -75,6 +76,8 @@ TAPi18n.subscribe = (name) ->
 
       subscription =
         Meteor.subscribe.apply @, removeTrailingUndefs [].concat(name, params, lang_tag, callbacks)
+
+      subscriptionChangedDep.changed()
 
   # If TAPi18n is called in a computation, to maintain Meteor.subscribe
   # behavior (which never gets invalidated), we don't want the computation to
@@ -97,9 +100,9 @@ TAPi18n.subscribe = (name) ->
 
   return {
     ready: () ->
+      subscriptionChangedDep.depend()
       subscription.ready()
     stop: () ->
       subscription_computation.stop()
     _subscription: subscription
   }
-
