@@ -1,5 +1,6 @@
 Package.describe({
-  summary: 'Internationalization for Meteor Collections'
+  summary: 'Internationalization for Meteor Collections',
+  version: '0.2.0'
 });
 
 Package.on_use(function (api) {
