@@ -1,4 +1,8 @@
-2014.07.30, Version 0.2.0
+2014.09.16, Version 0.3.0
+
+* Migrate to Meteor v0.9
+
+2014.07.30, Version 0.2.0, 2e3ed22f7bc97734cdab6b3aedd10f33f6b9c9d3
 
 * Bugfix: TAPi18n.subscription: Call onReady/Error() and error/ready() only
   once per subscription (and not for every time we resubscribe as a result of a
