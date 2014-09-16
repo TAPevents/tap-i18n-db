@@ -2,7 +2,7 @@
 
 ### Internationalization for Meteor Collections
 
-**tap-i18n-db** is a smart package for [Meteor](http://www.meteor.com) that
+**tap-i18n-db** is a [Meteor](http://www.meteor.com) package that
 extends [tap-i18n](https://github.com/TAPevents/tap-i18n) to allow the translation of collections.
 
 ## Key Features
