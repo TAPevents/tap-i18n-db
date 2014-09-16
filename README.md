@@ -24,7 +24,7 @@ extends [tap-i18n](https://github.com/TAPevents/tap-i18n) to allow the translati
 **Step 1:** Install tap-i18n-db:
 
 ```bash
-$ mrt add tap-i18n-db
+$ meteor add tap:i18n-db
 ```
 
 **Step 2:** Initialize the collection you wish to translate with `new TAPi18n.Collection`
