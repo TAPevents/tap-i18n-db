@@ -438,7 +438,7 @@ Example:
 TAPi18n.setLanguage("aa")
   .done(function () {
     _id = tap_i18n_col.insertTranslations({a: 1, b: 2}, {aa: {x: 9, y: 2, z: 1}})
-    tap_i18n_col.removeLanguage(_id, {x: 1, z: 3});
+    tap_i18n_col.updateLanguage(_id, {x: 1, z: 3});
     // -> result: {a: 1, b: 2, i18n: {aa: {x: 1, y: 2, z: 3}}, _id: _id}
   });
 ```
