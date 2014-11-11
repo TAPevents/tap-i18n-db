@@ -68,9 +68,9 @@ TAPi18n.subscribe = (name) ->
       callbacks = params.pop()
 
   # We want the onReady/onError methods to be called only once (not for every language change)
-  onReadyCalled = false;
-  onErrorCalled = false;
-  original_onReady = callbacks.onReady;
+  onReadyCalled = false
+  onErrorCalled = false
+  original_onReady = callbacks.onReady
   callbacks.onReady = ->
     if onErrorCalled
       return
