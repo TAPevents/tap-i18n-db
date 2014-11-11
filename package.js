@@ -1,7 +1,7 @@
 Package.describe({
   name: 'tap:i18n-db',
   summary: 'Internationalization for Meteor Collections',
-  version: '0.3.0',
+  version: '0.3.1',
   git: 'https://github.com/TAPevents/tap-i18n-db'
 });
 

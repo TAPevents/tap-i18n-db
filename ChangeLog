@@ -1,3 +1,8 @@
+2014.11.11, Version 0.3.1
+
+* Bugfix: init TAPi18n.subscribe's ready state according to the underlying sub
+ready state. Thanks to @rijk for bringing this bug to my attention.
+
 2014.09.16, Version 0.3.0
 
 * Migrate to Meteor v0.9

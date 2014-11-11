@@ -520,6 +520,7 @@ You can also test a specific environment:
 ## Contributors
 
 [Chris Hitchcott](https://github.com/hitchcott/)
+[Rijk van Wel](https://github.com/rijk)
 
 ## Credits
 
