@@ -96,6 +96,9 @@ TAPi18n.subscribe = (name) ->
       subscription =
         Meteor.subscribe.apply @, removeTrailingUndefs [].concat(name, params, lang_tag, callbacks)
 
+      # if the subscription is already ready: 
+      local_session.set("ready", subscription.ready())
+
   # If TAPi18n is called in a computation, to maintain Meteor.subscribe
   # behavior (which never gets invalidated), we don't want the computation to
   # get invalidated when TAPi18n.getLanguage get invalidated (when language get
