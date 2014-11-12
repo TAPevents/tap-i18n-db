@@ -5,6 +5,8 @@
 **tap-i18n-db** is a [Meteor](http://www.meteor.com) package that
 extends [tap-i18n](https://github.com/TAPevents/tap-i18n) to allow the translation of collections.
 
+Developed by <a href="http://www.meteorspark.com"><img src="http://www.meteorspark.com/logo/logo-github.png" title="MeteorSpark" alt="MeteorSpark"></a> [Professional Meteor Services](http://www.meteorspark.com) for <a href="http://tapevents.com/"><img src="http://www.meteorspark.com/logo/customers/tapevents.png" title="TAPevents" alt="TAPevents"></a> [World's Best Event Technology](http://tapevents.com/).
+
 ## Key Features
 
 **Transparent Language-Aware Publications:** You define publish/subscribe methods in the same way you are used to. The fields on the client will be automatically translated and will be updated reactively.
