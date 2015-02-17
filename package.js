@@ -15,6 +15,8 @@ Package.on_use(function (api) {
   api.use('tap:i18n@1.0.3', ['client', 'server']);
   api.imply('tap:i18n', ['client', 'server']);
 
+  api.use('yogiben:admin', {weak: true});
+
   api.add_files('globals.js', ['client', 'server']);
   api.add_files('tap_i18n_db-common.coffee', ['client', 'server']);
   api.add_files('tap_i18n_db-server.coffee', 'server');

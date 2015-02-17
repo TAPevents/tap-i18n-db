@@ -7,6 +7,10 @@ TAPi18n.Collection = (name, options={}) ->
 
   collection = share.i18nCollectionExtensions(commonCollectionExtensions(new Meteor.Collection(name, options)))
 
+  if Meteor.isClient
+    if Package["yogiben:admin"]?
+      collection._disableTransformationOnRoute(/^\/admin(\/?$|\/)/)
+
   collection._base_language = if "base_language" of options then options["base_language"] else globals.fallback_language
 
   return collection
