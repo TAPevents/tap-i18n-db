@@ -2,6 +2,10 @@ removeTrailingUndefs = share.helpers.removeTrailingUndefs
 extend = $.extend
 
 share.i18nCollectionTransform = (doc, collection) ->
+  for route in collection._disabledOnRoutes
+    if route.test(window.location.pathname)
+      return doc
+
   collection_base_language = collection._base_language
   language = TAPi18n.getLanguage()
 
@@ -46,6 +50,10 @@ share.i18nCollectionExtensions = (obj) ->
       local_session.set "force_lang_switch_reactivity_hook", TAPi18n.getLanguage()
 
     return
+
+  obj._disabledOnRoutes = []
+  obj._disableTransformationOnRoute = (route) ->
+    obj._disabledOnRoutes.push(route)
 
   if Package.autopublish?
     obj.forceLangSwitchReactivity()
