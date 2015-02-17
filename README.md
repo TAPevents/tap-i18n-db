@@ -1,5 +1,7 @@
 # tap-i18n-db
 
+Extends the tap:i18n package to allow the translation of collections.
+
 ### Internationalization for Meteor Collections
 
 **tap-i18n-db** is a [Meteor](http://www.meteor.com) package that

@@ -1,3 +1,8 @@
+2015.02.18, Version 0.4.0
+
+* Add support for the yogiben:admin package
+* Add a mechanizem to disable the i18n-db transformation on specific routes
+
 2014.11.11, Version 0.3.1
 
 * Bugfix: init TAPi18n.subscribe's ready state according to the underlying sub
