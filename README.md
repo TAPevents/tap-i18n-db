@@ -7,6 +7,8 @@ Extends the tap:i18n package to allow the translation of collections.
 **tap-i18n-db** is a [Meteor](http://www.meteor.com) package that
 extends [tap-i18n](https://github.com/TAPevents/tap-i18n) to allow the translation of collections.
 
+[Watch a talk about tap:i18n-db](https://www.youtube.com/watch?v=cu_dsoIc_0E).
+
 Developed by <a href="http://www.meteorspark.com"><img src="http://www.meteorspark.com/logo/logo-github.png" title="MeteorSpark" alt="MeteorSpark"></a> [Professional Meteor Services](http://www.meteorspark.com)<br/> for <a href="http://tapevents.com/"><img src="http://tapevents.com/wp-content/uploads/2015/02/TAPevents_logo_144px.png" title="TAPevents" alt="TAPevents" style='margin-top:10px'>&nbsp; Event Apps Hong Kong</a>.
 
 ## Key Features
