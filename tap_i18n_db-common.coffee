@@ -142,22 +142,27 @@ commonCollectionExtensions = (obj) ->
     for field in fields
       lang = _.first field.split(".")
 
-      # make sure all languages are supported
-      try
-        isSupportedLanguage lang, "remove translations", callback
-      catch
-        return null
-
-      # treat base language's fields as regular fields
-      if lang == @._base_language
-        field = field.replace("#{lang}.", "")
-        if field == @._base_language
-          reportError new Meteor.Error(400, "Complete removal of collection's base language from a document is not permitted"), "remove translations", callback
+      if lang is '*'
+        field = field.replace('*', '')
+        _.each TAPi18n.conf.supported_languages, ( lang ) ->
+          updates["i18n.#{lang}#{field}"] = ''
+      else
+        # make sure all languages are supported
+        try
+          isSupportedLanguage lang, "remove translations", callback
+        catch
           return null
 
-        updates[field] = ""
-      else
-        updates["i18n.#{field}"] = ""
+        # treat base language's fields as regular fields
+        if lang == @._base_language
+          field = field.replace("#{lang}.", "")
+          if field == @._base_language
+            reportError new Meteor.Error(400, "Complete removal of collection's base language from a document is not permitted"), "remove translations", callback
+            return null
+
+          updates[field] = ""
+        else
+          updates["i18n.#{field}"] = ""
 
     @.update.apply @, removeTrailingUndefs([selector, {$unset: updates}, options, callback])
 
