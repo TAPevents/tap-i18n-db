@@ -8,6 +8,9 @@ TAPi18n.Collection = (name, options={}) ->
   collection = share.i18nCollectionExtensions(commonCollectionExtensions(new Meteor.Collection(name, options)))
 
   if Meteor.isClient
+    # Completely disable transformation in client (for admins, or translation tools)
+    collection._disableTransformation = if "disableTransformation" of options then options["disableTransformation"] else false
+    # TODO: remove hardcoded packages from code out to config or other file
     if Package["yogiben:admin"]?
       collection._disableTransformationOnRoute(/^\/admin(\/?$|\/)/)
 
