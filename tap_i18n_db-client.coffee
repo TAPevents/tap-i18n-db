@@ -2,6 +2,9 @@ removeTrailingUndefs = share.helpers.removeTrailingUndefs
 extend = $.extend
 
 share.i18nCollectionTransform = (doc, collection) ->
+  if collection._disableTransformation
+    return doc
+
   for route in collection._disabledOnRoutes
     if route.test(window.location.pathname)
       return doc
@@ -51,6 +54,7 @@ share.i18nCollectionExtensions = (obj) ->
 
     return
 
+  obj._disableTransformation = false
   obj._disabledOnRoutes = []
   obj._disableTransformationOnRoute = (route) ->
     obj._disabledOnRoutes.push(route)
@@ -104,7 +108,7 @@ TAPi18n.subscribe = (name) ->
       subscription =
         Meteor.subscribe.apply @, removeTrailingUndefs [].concat(name, params, lang_tag, callbacks)
 
-      # if the subscription is already ready: 
+      # if the subscription is already ready:
       local_session.set("ready", subscription.ready())
 
   # If TAPi18n is called in a computation, to maintain Meteor.subscribe
@@ -115,7 +119,7 @@ TAPi18n.subscribe = (name) ->
   if currentComputation?
     # If TAPi18n.subscribe was called in a computation, call subscribe in a
     # non-reactive context, but make sure that if the computation is getting
-    # invalidated also the subscription computation 
+    # invalidated also the subscription computation
     # (invalidations are allowed up->bottom but not bottom->up)
     Deps.onInvalidate ->
       subscription_computation.invalidate()
