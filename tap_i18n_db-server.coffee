@@ -13,7 +13,7 @@ share.i18nCollectionExtensions = (obj) ->
     dialect_of = share.helpers.dialectOf current_language
     collection_base_language = @._base_language
 
-    supported_languages = TAPi18n.conf.supported_languages
+    supported_languages = TAPi18n.conf.supported_languages || Object.keys TAPi18n.getLanguages()
     if current_language? and not (current_language in supported_languages)
       throw new Meteor.Error(400, "Not supported language")
 
