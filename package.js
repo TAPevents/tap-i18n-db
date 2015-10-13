@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'tap:i18n-db',
-  summary: 'Internationalization for Meteor Collections',
-  version: '0.4.0',
-  git: 'https://github.com/TAPevents/tap-i18n-db'
+  name: 'phowat:i18n-db',
+  summary: 'Internationalization for Meteor Collections. Forked from tap:i18n-db',
+  version: '0.4.1',
+  git: 'https://github.com/phowat/tap-i18n-db'
 });
 
 Package.on_use(function (api) {
