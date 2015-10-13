@@ -30,7 +30,7 @@ Developed by <a href="http://www.meteorspark.com"><img src="http://www.meteorspa
 **Step 1:** Install tap-i18n-db:
 
 ```bash
-$ meteor add tap:i18n-db
+$ meteor add phowat:i18n-db
 ```
 
 **Step 2:** Initialize the collection you wish to translate with `new TAPi18n.Collection`
