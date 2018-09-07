@@ -518,51 +518,85 @@ if Meteor.isClient
 
     subscriptions = subscribe_simple_subscriptions()
 
-    last_invalidation = null
+    comp = null
     documents = null
+    testRunner = null
+
+    testFunc = -> _.defer ->
+      console.log "Testing simple subscriptions' reactivity: language=#{TAPi18n.getLanguage()}"
+
+      # test
+      general_tests(test, subscriptions, documents)
+
+      validate_simple_subscriptions_documents(test, subscriptions, documents)
+
+      lang_id = supported_languages.indexOf(TAPi18n.getLanguage())
+      if lang_id + 1 < supported_languages.length
+        # switch language
+        testRunner = _.once testFunc
+        TAPi18n.setLanguage supported_languages[lang_id + 1]
+      else
+        # stop
+        comp.stop()
+        onComplete()
+
+    testRunner = _.once testFunc
+
     comp = Deps.autorun ->
       documents = get_all_docs()
 
-      last_invalidation = share.now()
+      if _.every(subscriptions[0], (sub) => sub.ready())
+        testRunner()
+      
+  if not Package.autopublish?
+    Tinytest.addAsync 'tap-i18n-db - reactivity test - complex subscription', (test, onComplete) ->
+      stop_all_subscriptions()
 
-    interval_handle = Meteor.setInterval (->
-      if last_invalidation + idle_time < share.now()
-        # comp is idle
+      fields_to_exclude = ["not_translated_to_en", "not_translated_to_aa", "not_translated_to_aa-AA"]
+      testCases = [];
+      _.each supported_languages, (language) ->
+        _.each fields_to_exclude, (field_to_exclude) ->
+          _.times 2, (projection_type) ->
+            testCases.push
+              projection_type: projection_type
+              field_to_exclude: field_to_exclude
+              language: language
 
-        console.log "Testing simple subscriptions' reactivity: language=#{TAPi18n.getLanguage()}"
+      local_session = new ReactiveDict()
+
+      shiftTest = ->
+        oneTest = testCases.shift()
+        if oneTest
+          local_session.set "field_to_exclude", oneTest.field_to_exclude
+          local_session.set "projection_type", oneTest.projection_type
+          TAPi18n.setLanguage oneTest.language
+        oneTest
+      
+      shiftTest();
+
+      fields = null
+      subscriptions = null
+      documents = null
+      comp = null
+      testRunner = null
+
+      testFunc = -> _.defer ->
+        console.log "Testing complex subscriptions' reactivity: language=#{TAPi18n.getLanguage()}; field_to_exclude=#{local_session.get("field_to_exclude")}; projection_type=#{if local_session.get("projection_type") then "inclusive" else "exclusive"}; projection=#{JSON.stringify fields}"
 
         # test
         general_tests(test, subscriptions, documents)
 
-        validate_simple_subscriptions_documents(test, subscriptions, documents)
+        documents.all.forEach (doc) ->
+          test.isUndefined doc[local_session.get("field_to_exclude")]
 
-        lang_id = supported_languages.indexOf(TAPi18n.getLanguage())
-        if lang_id + 1 < supported_languages.length
-          # switch language
-          TAPi18n.setLanguage supported_languages[lang_id + 1]
-        else
+        testRunner = _.once testFunc
+
+        if !shiftTest()
           # stop
           comp.stop()
-
-          Meteor.clearInterval interval_handle
-
           onComplete()
-    ), idle_time
+      testRunner = _.once testFunc
 
-  if not Package.autopublish?
-    Tinytest.addAsync 'tap-i18n-db - reactivity test - complex subscription', (test, onComplete) ->
-      stop_all_subscriptions()
-      TAPi18n.setLanguage supported_languages[0]
-
-      fields_to_exclude = ["not_translated_to_en", "not_translated_to_aa", "not_translated_to_aa-AA"]
-
-      local_session = new ReactiveDict()
-      local_session.set("field_to_exclude", fields_to_exclude[0])
-
-      local_session.set("projection_type", 0)
-
-      fields = null
-      subscriptions = null
       Deps.autorun ->
         field_to_exclude = local_session.get("field_to_exclude")
         fields = {}
@@ -583,44 +617,13 @@ if Meteor.isClient
 
         subscriptions = [[subscription_a, subscription_b, subscription_c], [a_dfd, b_dfd, c_dfd]]
 
-      last_invalidation = null
-      documents = null
       comp = Deps.autorun ->
         documents = get_all_docs()
-
-        last_invalidation = share.now()
-
-      interval_handle = Meteor.setInterval (->
-        if last_invalidation + idle_time < share.now()
-          # comp is idle
-
-          console.log "Testing complex subscriptions' reactivity: language=#{TAPi18n.getLanguage()}; field_to_exclude=#{local_session.get("field_to_exclude")}; projection_type=#{if local_session.get("projection_type") then "inclusive" else "exclusive"}; projection=#{EJSON.stringify fields}"
-
-         # test
-         general_tests(test, subscriptions, documents)
-
-         documents.all.forEach (doc) ->
-           test.isUndefined doc[local_session.get("field_to_exclude")]
-
-         if local_session.get("projection_type") == 0
-           local_session.set("projection_type", 1)
-         else if local_session.get("projection_type") == 1 and \
-              ((projection_id = fields_to_exclude.indexOf(local_session.get("field_to_exclude"))) + 1) < fields_to_exclude.length
-           local_session.set("projection_type", 0)
-           local_session.set("field_to_exclude", fields_to_exclude[projection_id + 1])
-         else if (lang_id = supported_languages.indexOf(TAPi18n.getLanguage())) + 1 < supported_languages.length
-           # switch language
-           TAPi18n.setLanguage supported_languages[lang_id + 1]
-           local_session.set("projection_type", 0)
-           local_session.set("field_to_exclude", fields_to_exclude[0])
-         else
-           # stop
-           comp.stop()
-
-           Meteor.clearInterval interval_handle
-
-           onComplete()
-     ), idle_time
+        # include reactive dict to invalidate tracker 
+        local_session.get("projection_type")
+        local_session.get("field_to_exclude")
+        if _.every(subscriptions[0], (sub) => sub.ready())
+          testRunner()
 
 # Translations editing tests that require env language != null
 if Meteor.isClient
